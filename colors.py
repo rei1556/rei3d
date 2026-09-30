@@ -1,0 +1,27 @@
+"""
+COLORS.PY
+
+file to hold color constants
+"""
+
+FGWHITE = (255, 255, 255)
+FGCYAN = (0, 255, 255)
+FGPURPLE = (255, 0, 255)
+FGBLUE = (0, 0, 255)
+FGYELLOW = (255, 255, 0)
+FGGREEN = (0, 255, 0)
+FGRED = (255, 0, 0)
+FGBLACK = (0, 0, 0)
+
+BGWHITE = (127, 127, 127)
+BGCYAN = (0, 127, 127)
+BGPURPLE = (127, 0, 127)
+BGBLUE = (0, 0, 127)
+BGYELLOW = (127, 127, 0)
+BGGREEN = (0, 127, 0)
+BGRED = (127, 0, 0)
+BGBLACK = (0, 0, 0)
+
+OPAQUE = 255
+SEMIOPAQUE = 127
+TRANSPARENT = 0
