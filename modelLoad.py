@@ -17,9 +17,5 @@ class Model:
         self.uv = numpy.stack([numpy.stack([numpy.frombuffer(model.get("uv%da" % c), dtype=numpy.float32), numpy.frombuffer(model.get("uv%db" % c), dtype=numpy.float32)], axis=-1) for c in (1, 2, 3)], axis=1)
         self.matID = numpy.frombuffer(model.get("matID"), dtype=numpy.uint16)
     
-    def getMesh(self): # → list[int * 3,]
-        mesh = []
-        for tri in self.pos:
-            mesh += [*tri.flatten()] # should just splat the two lists together
-        mesh = numpy.array(mesh, dtype='f4')
-        return mesh
+    def getMesh(self): 
+        return numpy.concatenate([self.pos, self.uv], axis=2).astype('f4').reshape(-1) # okay this is a lot cleaner

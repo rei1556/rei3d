@@ -20,11 +20,12 @@ ctx = moderngl.get_context()
 ctx.enable(moderngl.DEPTH_TEST)
 
 class Mesh:
-    def __init__(self, vertices, position, rotation, debugColor, ctx):
+    def __init__(self, vertices, position, rotation, texture, debugColor, ctx):
         self.vertices = vertices
         self.vertexBuffer = ctx.buffer(vertices.astype('f4').tobytes())
         self.position = numpy.array(position, dtype='f4')
         self.rotation = numpy.array(rotation, dtype='f4')
+        self.texture = texture
         self.debugColor = debugColor
 
         with open('meshSetup.glsl', 'r') as f:
@@ -33,7 +34,7 @@ class Mesh:
         fragmentSrc = "#version 330\n#define FRAGMENT_SHADER\n" + shaderSrc
         self.program = ctx.program(vertex_shader=vertexSrc, fragment_shader=fragmentSrc)
 
-        self.vao = ctx.vertex_array(self.program, [(self.vertexBuffer, '3f', 'position')])
+        self.vao = ctx.vertex_array(self.program, [(self.vertexBuffer, '3f 2f', 'position', 'uv')])
 
 
 class Camera:
@@ -125,13 +126,23 @@ class Camera:
         mvp = self.projMatrix @ self.viewMatrix @ modelMatrix
 
         mesh.program['u_mvp'].write(mvp.T.astype('f4').tobytes())
-        mesh.program['u_color'].value = tuple(mesh.debugColor)
+        #mesh.program['u_color'].value = tuple(mesh.debugColor)
+        mesh.texture.use(location=0)
         mesh.vao.render()
 
+def makeTexture(ctx, rgbaBytes, size):
+    tex = ctx.texture(size, 4, rgbaBytes)
+    tex.filter = (moderngl.NEAREST, moderngl.NEAREST) # oh! so retro!
+    tex.repeat_x = tex.repeat_y = True
+    return tex
+
+img = Image.open('texture/2_052b9c3a41f41069.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+tex = makeTexture(ctx, img.tobytes(), img.size)
 
 cube = Mesh(modelLoad.Model('model/Cube.nlm').getMesh(), 
                 [0, 0, -1],
                 [0, 0, 0],
+                tex,
                 numpy.array(COLORS.BGWHITE + (COLORS.OPAQUE,), dtype='f4'), ctx)
 
 cam = Camera(
