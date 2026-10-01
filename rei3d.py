@@ -10,6 +10,7 @@ import pygame
 import math
 import colors as COLORS
 from PIL import Image
+import modelLoad
 
 GLOB_RESO = (640, 480)
 
@@ -128,16 +129,8 @@ class Camera:
         mesh.vao.render()
 
 
-triangle = Mesh(numpy.array([
-    -0.5, -0.5, 0.0,
-    0.5, -0.5, 0.0,
-    0.0, 0.5, 0.0,
-    -0.5, -0.5, -1.0,
-    0.5, -0.5, -1.0,
-    0.0,  0.5, -1.0,
-
-], dtype='f4'), 
-                [0, 0, 0],
+cube = Mesh(modelLoad.Model('model/Cube.nlm').getMesh(), 
+                [0, 0, -1],
                 [0, 0, 0],
                 numpy.array(COLORS.BGWHITE + (COLORS.OPAQUE,), dtype='f4'), ctx)
 
@@ -161,8 +154,8 @@ while running:
     
     now = pygame.time.get_ticks() / 1000.0
 
-    triangle.rotation[1] += 0.2 * dt
+    cube.rotation[1] += 0.2 * dt
 
     ctx.clear(0,0,0,1,depth=1.0)
 
-    cam.render(triangle)
+    cam.render(cube)

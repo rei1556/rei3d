@@ -21,4 +21,5 @@ class Model:
         mesh = []
         for tri in self.pos:
             mesh += [*tri.flatten()] # should just splat the two lists together
+        mesh = numpy.array(mesh, dtype='f4')
         return mesh
