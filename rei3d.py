@@ -17,10 +17,11 @@ w = pygame.display.set_mode(GLOB_RESO, pygame.OPENGL | pygame.DOUBLEBUF)
 ctx = moderngl.get_context()
 
 class Mesh:
-    def __init__(self, vertices, debugColor, ctx):
+    def __init__(self, vertices, position, rotation, debugColor, ctx):
         self.vertices = vertices
         self.vertexBuffer = ctx.buffer(vertices.astype('f4').tobytes())
-        self.position = numpy.array([0.0, 0.0, 0.0], dtype='f4')
+        self.position = numpy.array(position, dtype='f4')
+        self.rotation = numpy.array(rotation, dtype='f4')
         self.debugColor = debugColor
 
         with open('meshSetup.glsl', 'r') as f:
@@ -88,10 +89,35 @@ class Camera:
         self.viewMatrix = rotMatrix.T @ transMatrix
 
     def render(self, mesh):
-        modelMatrix = numpy.identity(4, dtype='f4')
-        modelMatrix[0, 3] = mesh.position[0]
-        modelMatrix[1, 3] = mesh.position[1]
-        modelMatrix[2, 3] = mesh.position[2]
+        modelTransMatrix = numpy.identity(4, dtype='f4')
+        modelTransMatrix[0, 3] = mesh.position[0]
+        modelTransMatrix[1, 3] = mesh.position[1]
+        modelTransMatrix[2, 3] = mesh.position[2]
+
+        p, y, r = map(math.radians, mesh.rotation)
+
+        rX = numpy.array([
+            [1, 0,        0,               0],
+            [0, math.cos(p), -math.sin(p), 0],
+            [0, math.sin(p), math.cos(p),  0],
+            [0, 0,        0,               1]
+            ], dtype='f4')
+        rY = numpy.array([
+            [math.cos(y),  0, math.sin(y), 0],
+            [0,            1, 0,           0],
+            [-math.sin(y), 0, math.cos(y), 0],
+            [0,            0, 0,           1]
+            ], dtype='f4')
+        rZ = numpy.array([
+            [math.cos(r), -math.sin(r), 0, 0],
+            [math.sin(r), math.cos(r),  0, 0],
+            [0,           0,            1, 0],
+            [0,           0,            0, 1]
+            ], dtype='f4')
+
+        modelRotMatrix = rY @ rX @ rZ
+
+        modelMatrix = modelTransMatrix @ modelRotMatrix
 
         mvp = self.projMatrix @ self.viewMatrix @ modelMatrix
 
@@ -103,10 +129,13 @@ triangle = Mesh(numpy.array([
     -0.5, -0.5, 0.0,
     0.5, -0.5, 0.0,
     0.0, 0.5, 0.0
-], dtype='f4'), numpy.array(COLORS.BGWHITE + (COLORS.OPAQUE,), dtype='f4'), ctx)
+], dtype='f4'), 
+                [0, 0, 0],
+                [0, 0, 0],
+                numpy.array(COLORS.BGWHITE + (COLORS.OPAQUE,), dtype='f4'), ctx)
 
 cam = Camera(
-    [0, 0, -2],
+    [0, 0, 2],
     [0, 0, 0],
     (0.01, 128),
     90
@@ -114,14 +143,19 @@ cam = Camera(
 
 running = True
 clock = pygame.time.Clock()
+spin = 0
 while running:
     pygame.display.flip()
     dt = clock.tick()
+    cam.updateMatrix()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     
     now = pygame.time.get_ticks() / 1000.0
+
+    triangle.rotation[1] += 0.2 * dt
+
     ctx.clear(0,0,0)
 
     cam.render(triangle)
