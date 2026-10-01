@@ -22,13 +22,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="colors.py" />
+    <Compile Include="NLDATA.py" />
     <Compile Include="rei3d.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cube.obj" />
     <Content Include="meshSetup.glsl" />
+    <Content Include="modelLoad.py" />
+    <Content Include="model\Cube.nlm" />
+    <Content Include="model\cube.obj" />
     <Content Include="texture\2_052b9c3a41f41069.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="model\" />
     <Folder Include="texture\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
