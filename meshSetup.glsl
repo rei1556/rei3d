@@ -3,10 +3,9 @@
 
 #ifdef VERTEX_SHADER
 in vec3 position;
-uniform vec3 u_position;
+uniform mat4 u_mvp;
 void main() {
-    gl_Position = vec4(position + u_position, 1.0);
-    
+    gl_Position = u_mvp * vec4(position, 1.0);
 }
 #endif
 

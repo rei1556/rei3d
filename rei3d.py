@@ -31,10 +31,6 @@ class Mesh:
 
         self.vao = ctx.vertex_array(self.program, [(self.vertexBuffer, '3f', 'position')])
 
-    def draw(self, ctx):
-        self.program['u_position'].value = tuple(self.position)
-        self.program['u_color'].value = tuple(self.debugColor)
-        self.vao.render()
 
 class Camera:
     def __init__(self, position, rotation, clipPlanes:list, fov):
@@ -91,11 +87,30 @@ class Camera:
 
         self.viewMatrix = rotMatrix.T @ transMatrix
 
+    def render(self, mesh):
+        modelMatrix = numpy.identity(4, dtype='f4')
+        modelMatrix[0, 3] = mesh.position[0]
+        modelMatrix[1, 3] = mesh.position[1]
+        modelMatrix[2, 3] = mesh.position[2]
+
+        mvp = self.projMatrix @ self.viewMatrix @ modelMatrix
+
+        mesh.program['u_mvp'].write(mvp.T.astype('f4').tobytes())
+        mesh.program['u_color'].value = tuple(mesh.debugColor)
+        mesh.vao.render()
+
 triangle = Mesh(numpy.array([
     -0.5, -0.5, 0.0,
     0.5, -0.5, 0.0,
     0.0, 0.5, 0.0
 ], dtype='f4'), numpy.array(COLORS.BGWHITE + (COLORS.OPAQUE,), dtype='f4'), ctx)
+
+cam = Camera(
+    [0, 0, -2],
+    [0, 0, 0],
+    (0.01, 128),
+    90
+    )
 
 running = True
 clock = pygame.time.Clock()
@@ -108,3 +123,5 @@ while running:
     
     now = pygame.time.get_ticks() / 1000.0
     ctx.clear(0,0,0)
+
+    cam.render(triangle)
