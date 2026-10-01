@@ -36,6 +36,27 @@ class Mesh:
         self.program['u_color'].value = tuple(self.debugColor)
         self.vao.render()
 
+class Camera:
+    def __init__(self, position, rotation, clipPlanes:list, fov):
+        self.position = position
+        self.rotation = rotation
+        self.clipPlanes = clipPlanes
+        self.fov = fov
+        self.projMatrix = numpy.array([[0, 0, 0, 0] * 4])
+    
+    def updateMatrix(self):
+        a = GLOB_RESO[0] / GLOB_RESO[1]
+        n = self.clipPlanes[0]
+        f = self.clipPlanes[1]
+        theta = math.radians(self.fov)
+
+        self.projMatrix = numpy.array([ # i'm going to be honest and say i have no fucking clue what this means. i just copied something from wikipedia
+            [1/ (a * math.tan(theta/2)), 0,                    0,            0             ],
+            [0,                          1/ math.tan(theta/2), 0,            0             ],
+            [0,                          0,                    -(f+n / f-n), -(2*f*n / f-n)],
+            [0,                          0,                    -1,           0             ]
+            ])
+
 triangle = Mesh(numpy.array([
     -0.5, -0.5, 0.0,
     0.5, -0.5, 0.0,
@@ -53,5 +74,3 @@ while running:
     
     now = pygame.time.get_ticks() / 1000.0
     ctx.clear(0,0,0)
-    triangle.position = numpy.array([0.0, abs(math.sin(now*5))*0.5, 0.0], dtype='f4')
-    triangle.draw(ctx)
