@@ -9,12 +9,14 @@ import moderngl
 import pygame
 import math
 import colors as COLORS
+from PIL import Image
 
 GLOB_RESO = (640, 480)
 
 pygame.init()
 w = pygame.display.set_mode(GLOB_RESO, pygame.OPENGL | pygame.DOUBLEBUF)
 ctx = moderngl.get_context()
+ctx.enable(moderngl.DEPTH_TEST)
 
 class Mesh:
     def __init__(self, vertices, position, rotation, debugColor, ctx):
@@ -50,7 +52,7 @@ class Camera:
         tanHalfTheta = math.tan(theta/2) # lol
 
         self.projMatrix = numpy.array([ # i'm going to be honest and say i have no fucking clue what this means. i just copied something from wikipedia
-            [1/ (a * tanHalfTheta), 0,                    0,                0                 ],
+            [1/ (a * tanHalfTheta),      0,               0,                0                 ],
             [0,                          1/ tanHalfTheta, 0,                0                 ],
             [0,                          0,               -((f+n) / (f-n)), -((2*f*n) / (f-n))],
             [0,                          0,               -1,               0                 ]
@@ -125,6 +127,7 @@ class Camera:
         mesh.program['u_color'].value = tuple(mesh.debugColor)
         mesh.vao.render()
 
+
 triangle = Mesh(numpy.array([
     -0.5, -0.5, 0.0,
     0.5, -0.5, 0.0,
@@ -156,6 +159,6 @@ while running:
 
     triangle.rotation[1] += 0.2 * dt
 
-    ctx.clear(0,0,0)
+    ctx.clear(0,0,0,1,depth=1.0)
 
     cam.render(triangle)

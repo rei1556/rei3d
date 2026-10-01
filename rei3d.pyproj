@@ -26,6 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="meshSetup.glsl" />
+    <Content Include="texture\2_052b9c3a41f41069.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="texture\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
