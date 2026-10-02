@@ -136,17 +136,17 @@ def makeTexture(ctx, rgbaBytes, size):
     tex.repeat_x = tex.repeat_y = True
     return tex
 
-img = Image.open('texture/2_052b9c3a41f41069.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+img = Image.open('texture/v_shotgun.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
 tex = makeTexture(ctx, img.tobytes(), img.size)
 
-cube = Mesh(modelLoad.Model('model/Cube.nlm').getMesh(), 
-                [0, 0, -1],
+cube = Mesh(modelLoad.Model('model/Shotgun.nlm').getMesh(), 
+                [0, 0, 0],
                 [0, 0, 0],
                 tex,
                 numpy.array(COLORS.BGWHITE + (COLORS.OPAQUE,), dtype='f4'), ctx)
 
 cam = Camera(
-    [0, 0, 2],
+    [0, 0, 1],
     [0, 0, 0],
     (0.01, 128),
     90
